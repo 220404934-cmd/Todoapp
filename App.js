@@ -1,32 +1,26 @@
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
+import TodoItem from './components/TodoItem'; // استيراد المكون الجديد
 
 export default function App() {
-  // 🔹 1. State tanımlamaları
   const [enteredTaskText, setEnteredTaskText] = useState('');
   const [tasks, setTasks] = useState([]);
 
-  // 🔹 2. Kullanıcı girişini işleyen fonksiyon
   function taskInputHandler(enteredText) {
     setEnteredTaskText(enteredText);
   }
 
-  // 🔹 3. Görev ekleme fonksiyonu
   function addTaskHandler() {
-    if (enteredTaskText.trim().length === 0) {
-      return; // boş giriş yapılırsa hiçbir şey ekleme
-    }
+    if (enteredTaskText.trim().length === 0) return;
 
     setTasks((currentTasks) => [
       ...currentTasks,
       { id: Math.random().toString(), text: enteredTaskText },
     ]);
-
-    setEnteredTaskText(''); // giriş kutusunu temizle
+    setEnteredTaskText('');
   }
 
-  // 🔹 4. JSX — Görünüm kısmı
   return (
     <SafeAreaView style={styles.appContainer}>
       <View style={styles.contentContainer}>
@@ -36,48 +30,37 @@ export default function App() {
           <TextInput
             style={styles.textInput}
             placeholder="Yeni bir görev ekle..."
-            onChangeText={taskInputHandler} // state güncelle
-            value={enteredTaskText} // kontrollü bileşen
+            onChangeText={taskInputHandler}
+            value={enteredTaskText}
           />
           <Button title="Ekle" onPress={addTaskHandler} />
         </View>
 
-        {/* Liste alanı buraya gelecek */}
+        <View style={styles.listContainer}>
+          <FlatList
+            data={tasks}
+            renderItem={({ item }) => <TodoItem text={item.text} />}
+            keyExtractor={(item) => item.id}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>Henüz görev yok. Bir tane ekle! 📝</Text>
+            }
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
 }
 
-// 🔹 5. Stiller
 const styles = StyleSheet.create({
-  appContainer: {
-    flex: 1,
-    backgroundColor: '#f0f2f5', // Açık gri arka plan
-  },
-  contentContainer: {
-    flex: 1,
-    paddingTop: 40,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
+  appContainer: { flex: 1, backgroundColor: '#f0f2f5' },
+  contentContainer: { flex: 1, paddingTop: 40, paddingHorizontal: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
   inputContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20,
   },
   textInput: {
-    flex: 1, // geniş yer kapla
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
-    marginRight: 10,
-    fontSize: 16,
+    flex: 1, borderWidth: 1, borderColor: '#ccc', padding: 10, borderRadius: 8, marginRight: 10, fontSize: 16,
   },
+  listContainer: { flex: 5 },
+  emptyText: { textAlign: 'center', marginTop: 20, fontSize: 16, color: '#888' },
 });
